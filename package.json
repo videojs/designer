@@ -1,7 +1,7 @@
 {
-    "name": "less2css",
+    "name": "player-designer",
     "description": "Converts LESS to CSS and does other awesome stuff",
-    "version": "0.0.7-5",
+    "version": "0.0.7-6",
     "private": true,
     "author": "Brian Frichette",
     "homepage": "http://less2css.org/",
@@ -48,7 +48,10 @@
             "url": "http://opensource.org/licenses/MIT"
         }
     ],
-    "subdomain": "player-designer",
+    "subdomain": "designer",
+    "domains": [
+        "designer.videojs.com"
+    ],
     "engines": {
         "node": "0.8.x"
     }

@@ -10,7 +10,7 @@ module.exports = {
   }
 
   , home: function(req, res) {
-    var opts = { app: 'Less2Css', title : 'LESS2CSS | LESS Live Preview' };
+    var opts = { app: 'Less2Css', title : 'Video.js | Video Player Skin Designer' };
     res.render('less2css', opts);
   }
 
