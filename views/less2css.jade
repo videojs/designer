@@ -1,0 +1,129 @@
+extends layout
+
+block optionsDrawer
+  div(ng-controller='OptionsCtrl')
+    drawer(offset="'40px'", position="'top'", open="drawerOpen", opts="opts")
+      div.row-fluid.options-row.first-row
+        div.span3.option-column
+          label(for='less-version') LESS Version
+          select#less-version.less-version(
+            ng-model='opts.selectedVersion'
+            ng-options='version.number as version.label for version in opts.versions'
+          )
+
+        div.span3.option-column
+          label Output Line Numbers
+          //- i.icon-info-sign
+          button.btn.toggle-btn(
+            ng-class="{'btn-primary': opts.lineNumbersEnabled}"
+            ng-click="toggleOption('lineNumbersEnabled')"
+            ng-bind="toggleTxt('lineNumbersEnabled')"
+          ) Disabled
+
+          select(
+            ng-show="opts.lineNumbersEnabled"
+            ng-disabled="!opts.lineNumbersEnabled"
+            ng-model="opts.lineNumbers"
+            ng-options="opt.value as opt.label for opt in opts.lineNumberOptions"
+          )
+
+        div.span3.option-column
+          label Relative URLs
+          //- i.icon-info-sign
+          button.btn.toggle-btn(
+            ng-class="{'btn-primary': opts.relativeUrls }"
+            ng-click="toggleOption('relativeUrls')"
+            ng-bind="toggleTxt('relativeUrls')"
+          ) Disabled
+
+        div.span3.option-column
+          label Change Rootpath
+          //- i.icon-info-sign
+          button.btn.toggle-btn(
+            ng-class="{'btn-primary': opts.rootPathEnabled }"
+            ng-click="toggleOption('rootPathEnabled')"
+            ng-bind="toggleTxt('rootPathEnabled')"
+          ) Disabled
+
+          input.ng-cloak(
+            ng-show='opts.rootPathEnabled'
+            ng-disabled='!opts.rootPathEnabled'
+            ng-model='opts.rootpathText'
+            placeholder='Enter rootpath'
+            type='text'
+          )
+
+      div.row-fluid.options-row.last-row
+        div.span3.option-column(ng-hide='isLegacy()')
+          label Strict Math
+          //- i.icon-info-sign
+          button.btn.toggle-btn(
+            ng-class="{'btn-primary': opts.strictMath}"
+            ng-click="toggleOption('strictMath')"
+            ng-bind="toggleTxt('strictMath')"
+            ng-disabled="isLegacy()"
+          ) Disabled
+
+        div.span3.option-column(ng-hide='isLegacy()')
+          label Strict Units
+          //- i.icon-info-sign
+          button.btn.toggle-btn(
+            ng-class="{'btn-primary': opts.strictUnits}"
+            ng-click="toggleOption('strictUnits')"
+            ng-bind="toggleTxt('strictUnits')"
+            ng-disabled="isLegacy()"
+          ) Disabled
+
+block header
+  li.brand: a(href='/') VIDEO.JS PLAYER DESIGNER
+  //- li.divider-vertical
+  li.less-options(ng-class="{ 'active': drawerOpen }")
+    a(href="#", ng-click="toggleDrawer($event)") Options
+  li.divider-vertical
+  li.skin-styles-reset()
+    a(href="#") Reset
+  li.divider-vertical
+  //- li.option-info(ng-cloak)
+    span
+      | LESS Version:&nbsp;
+      code {{opts.selectedVersion}}
+    span(ng-if="opts.lineNumbersEnabled", ng-animate="{ enter: 'fade-in', leave: 'fade-out' }")
+      | Output Line Numbers:&nbsp;
+      code {{opts.dumpLineNumbers}}
+    span(ng-if="opts.relativeUrls", ng-animate="{ enter: 'fade-in', leave: 'fade-out' }")
+      | Relative URLs:&nbsp;
+      code {{opts.relativeUrls}}
+    span(ng-if="opts.rootPathEnabled", ng-animate="{ enter: 'fade-in', leave: 'fade-out' }")
+      | Rootpath:&nbsp;
+      code {{opts.rootpath}}
+    span(ng-if="opts.strictMath", ng-animate="{ enter: 'fade-in', leave: 'fade-out' }")
+      | Strict Math:&nbsp;
+      code {{opts.strictMath}}
+    span(ng-if="opts.strictUnits", ng-animate="{ enter: 'fade-in', leave: 'fade-out' }")
+      | Strict Units:&nbsp;
+      code {{opts.strictUnits}}
+  li: img#loading-gif.loading-gif(
+    ng-cloak
+    ng-show='loading == true'
+    ng-animate="{ enter : 'fade-in', leave: 'fade-out' }"
+    src='/images/loading.gif'
+    alt='Loading...'
+  )
+
+block content
+  div.row-fluid(ng-controller='Less2CssCtrl')
+    div.span6
+      div.code-wrap.left
+        h2.code-label LESS
+        textarea#less-input.less-input(placeholder="Input your LESS here.", less-editor, ng-model="lessInput")
+    div.span6
+      div#player-container.code-wrap
+        video#main-player.video-js.vjs-default-skin
+        style#skin-styles()
+      div.code-wrap.right(ng-class="{error: compileError == true}")
+        h2.code-label CSS
+        textarea.css-output(
+          less-editor
+          ng-model="cssOutput"
+          opts='cssEditorOptions'
+        )

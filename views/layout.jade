@@ -1,0 +1,85 @@
+!!! 5
+//if lt IE 7
+  html.lt-ie9.lt-ie8.lt-ie7(lang='en')
+//if IE 7
+  html.lt-ie9.lt-ie8(lang='en')
+//if IE 8
+  html.lt-ie9(lang='en')
+//[if gt IE 8]><!
+html(lang='en', ng-app='Less2Css', ng-controller='AppCtrl')
+  //<![endif]
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
+
+    title= title
+
+    meta(name='author', content='Brian Frichette')
+    meta(name='description', content='A LESS to CSS converter for the web')
+    meta(name='keywords', content='LESS2CSS,LESS CSS,preprocessor,converter,less.js,variables,mixins')
+    meta(name='viewport', content='width=device-width')
+    link(rel='shortcut icon', href='/images/favicon.ico')
+
+    link(rel='stylesheet', href='/stylesheets/codemirror.css')
+    link(rel='stylesheet', href="/stylesheets/style.css")
+
+  body
+    //if lt IE 7
+      p.chromeframe
+        | You are using an outdated browser.
+        a(href='http://browsehappy.com/') Upgrade your browser today
+        | or
+        a(href='http://www.google.com/chromeframe/?redirect=true') install Google Chrome Frame
+        | to better experience this site.
+
+    //- div.github-fork-ribbon-wrapper.right-bottom
+      .github-fork-ribbon
+        a(href="https://github.com/brian-frichette/less-preview/") Fork me on GitHub
+
+    // Main header wrapper
+    block optionsDrawer
+    div.navbar.navbar-fixed-top
+      div.navbar-inner
+        ul.nav
+          block header
+
+    // Main container
+    div.container-fluid
+      block content
+      block footer
+        footer.page-footer
+          p
+            | Video.js Player Designer is a fork of 
+            a(href="https://github.com/brian-frichette/less-preview/", target="_blank") Less2css 
+            | &copy; 2013 Brian Frichette &amp; Contributors. License&nbsp;
+            a(href="http://opensource.org/licenses/MIT", target="_blank") MIT
+            |.
+          p.small
+            | Special thanks for the Open Source technologies that made building this site a pleasure:&nbsp;
+            a(href="http://lesscss.org/", target="_blank") LESS
+            |,&nbsp;
+            a(href="http://twitter.github.com/bootstrap/", target="_blank") Twitter Bootstrap
+            |,&nbsp;
+            a(href="http://codemirror.net/", target="_blank") CodeMirror
+            |,&nbsp;
+            a(href="http://angularjs.org/", target="_blank") AngularJS
+            |, and&nbsp;
+            a(href="http://expressjs.com/", target="_blank") Express
+            |.
+
+    include partials/templates
+
+    block bottomScripts
+      each script in scripts
+        script(src='#{script}')
+      if env == 'production'
+        script.
+          var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-37443347-1']);
+          _gaq.push(['_trackPageview']);
+
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();

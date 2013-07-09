@@ -1,0 +1,352 @@
+* { outline: none !important; }
+html,
+body {
+  .box-sizing(border-box);
+  min-height: 100%;
+}
+
+body {
+  padding-top: 60px;
+  #gradient > .vertical(#eee, #bbb);
+}
+
+[ng-cloak],
+[data-ng-cloak],
+.ng-cloak {display:none;}
+
+@lightGray    : hsl(0, 0%, 80%);
+@lighterGray  : hsl(0, 0%, 96%);
+@codeMirrorBg : hsl(0, 0%, 15%);
+
+.four-oh-four {
+  text-align: center;
+  &.right-text { padding: 45px 0; }
+}
+
+.page-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 5;
+  padding: 15px 20px;
+  width: 100%;
+  border-top: 1px solid #999;
+  color: #555;
+  #gradient > .vertical(#eee, #aaa);
+  text-shadow: 0 1px @white;
+  .box-shadow(~"0 -5px 12px hsla(0, 0%, 0%, 0.15), inset 0 1px 0 hsla(0, 0%, 100%, 0.1)");
+  .box-sizing(border-box);
+
+  a { color: black; }
+  > p { margin: 0; }
+  > p.small { text-shadow: 0 1px 1px hsla(0, 0%, 100%, 0.6);}
+}
+
+.code { #font > #family > .monospace }
+
+.options-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  border-bottom: 1px solid #999;
+  // visibility: hidden;
+
+  #gradient > .vertical(#efefef, #bbb);
+  .box-shadow(0 10px 14px hsla(0, 0%, 0%, 0.25));
+  .translate3d(0, 0, 0);
+  .transition(all 0.4s ease-out);
+
+  [class^="icon-"],
+  [class*=" icon-"] {
+    margin-left: 3px;
+
+    .transition(all 0.4s);
+    .opacity(40);
+
+    &:hover { .opacity(80); }
+  }
+
+  .toggle-btn {
+    display: block;
+    margin-top: 10px;
+    width: 100%;
+
+    .box-sizing(border-box);
+  }
+
+
+  input[type=text],
+  select {
+    margin: 10px 0 0;
+    width: 100%;
+    height: 30px;
+
+    .box-sizing(border-box);
+  }
+
+  label { cursor: default; }
+  label, form { margin-bottom: 0 }
+}
+
+.options-drawer-wrap {
+  position: relative;
+  margin: 0;
+  padding: 20px;
+}
+
+.options-row {
+  padding-top: 10px;
+  padding-bottom: 15px;
+  border-top: 1px solid #aaa;
+  border-bottom: 1px solid #eee;
+  text-shadow: 0 1px 1px @white;
+
+  .btn { text-shadow: none; }
+
+  &.first-row {
+    padding-top: 0;
+    border-top: none;
+  }
+
+  &.last-row {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+// Options nav item
+.less-options {
+  position: relative;
+  z-index: 1;
+
+  .transition(all 0.5s);
+
+  &.open {
+    background-color: hsl(0, 0%, 90%);
+    color: hsl(0, 0%, 33%);
+
+    .box-shadow(inset 0 3px 8px hsla(0, 0%, 0%, 0.125));
+  }
+}
+
+.options-button {
+  position: absolute;
+  bottom: -13px;
+  left: 0;
+  z-index: 9999;
+  padding: 2px 0;
+  width: 100%;
+  height: 12px;
+  border: 1px solid @lightGray;
+  border-top: none;
+  background: url('/images/options-btn.png');
+  cursor: pointer;
+
+  .box-shadow(0 1px 4px hsla(0, 0%, 0%, 0.15));
+  .border-radius(0 0 2px 2px);
+  .background-size(cover);
+  .box-sizing(border-box);
+  .transition(all 0.2s);
+  .opacity(50);
+
+  &.active { .opacity(100); }
+}
+
+.less-options:hover .options-button { .opacity(100); }
+
+
+// Hack b/c IE9 still sucks and I don't feel like
+// dealing with it.
+.no-cssanimations {
+  .github-fork-ribbon,
+  .options-button { display: none; }
+}
+
+.less-version {
+  margin: 5px 0 0 0;
+  width: 100%;
+}
+
+.loading-gif { margin: 10px 0 0 10px; }
+
+.less-input {
+  max-width: 100%;
+  width: 100%;
+  height: 610px;
+}
+
+.css-output {
+  display: none;
+  overflow: auto;
+  padding: 8px;
+  height: 586px;
+
+  .border-radius(4px);
+}
+
+.code-wrap {
+  position: absolute;
+  top: 65px;
+  right: 0;
+  bottom: 100px;
+  left: 20px;
+  padding: 8px;
+  width: 47.5%;
+  border: 1px solid @lightGray;
+  background: @lighterGray;
+
+  .border-radius(4px);
+  .box-sizing(border-box);
+
+  &.left {}
+  &.right {
+    left: auto;
+    right: 20px;
+  }
+}
+
+h2.code-label {
+  position: absolute;
+  margin: 0;
+  right: 25px;
+  top: 5px;
+  z-index: 1;
+  font-size: 20px;
+  color: @lightGray;
+  text-shadow: -2px 2px 2px hsla(0, 0%, 0%, 0.7), -1px 1px 7px hsla(0, 0%, 0%, 0.2);
+}
+
+.small { font-size: 0.8em; margin: 0; }
+
+@media (max-width: 979px) and (min-width: 768px) {
+  .code-wrap { width: 46%; }
+}
+
+@media (max-width: 767px) {
+  body { padding-bottom: 20px; }
+
+  .code-wrap {
+    position: relative;
+    top: 0;
+    bottom: 0;
+    left: auto;
+    margin-bottom: 15px;
+    width: auto;
+    .CodeMirror { height: 600px; }
+
+    &.right { right: auto; }
+  }
+
+  h2.code-label {
+    font-size: 16px;
+    right: 35px;
+  }
+
+  .page-footer {
+    background: none;
+    border-top: 1px solid #aaa;
+    .box-shadow(none);
+    position: static;
+    margin-top: 15px;
+    padding: 15px 0;
+  }
+  .option-column {
+    margin-top: 15px;
+    &:first-child { margin-top: 0; }
+  }
+}
+
+.CodeMirror {
+  height: 100%;
+  .border-radius(3px);
+}
+
+.CodeMirror-gutters,
+.CodeMirror-gutter { .border-radius(3px 0 0 3px); }
+
+/* Highlight.js and CodeMirror */
+.css-output,
+.cm-s-lesser-dark {
+  font-size: 12px;
+  line-height: 1.4;
+
+  #font > #family > .monospace;
+}
+
+.cm-s-lesser-dark.CodeMirror {
+  background: @codeMirrorBg;
+  color: hsl(90, 20%, 92%);
+  text-shadow: 0 -1px 1px @codeMirrorBg;
+}
+
+.cm-s-lesser-dark pre { padding: 0 8px; } // editable code holder
+
+div.CodeMirror span.CodeMirror-matchingbracket { color: hsl(120, 95%, 74%); }
+
+.cm-s-lesser-dark span.cm-tag      { color : hsl( 189,  20%,   50% ) }
+.cm-s-lesser-dark span.cm-meta     { color : hsl( 120,  10%,   50% ) }
+.cm-s-lesser-dark span.cm-number   { color : hsl( 10,   40%,   50% ) }
+.cm-s-lesser-dark span.cm-string   { color : hsl( 75,   50%,   65% ) }
+.cm-s-lesser-dark span.cm-comment  { color : hsl( 0,    0%,    40% ) }
+.cm-s-lesser-dark span.cm-keyword  { color : hsl( 215,  100%,  67% ) }
+.cm-s-lesser-dark span.cm-variable { color : hsl( 40,   50%,   70% ) }
+
+.cm-s-lesser-dark {
+  div.CodeMirror-selected { background: hsl(54, 8%, 25%) !important; }
+  pre { padding: 0 8px; } /*editable code holder*/
+  .CodeMirror-cursor { border-left: 1px solid white !important; }
+
+  .CodeMirror-gutters {
+    padding-right: 1px;
+    border-right: 1px solid hsl(0, 0%, 20%);
+
+    background: @codeMirrorBg;
+  }
+
+  .CodeMirror-linenumber { color: hsl(0, 0%, 47%); }
+
+  span {
+    &.cm-hr         { color : hsl( 0,    0%,    60%  ) }
+    &.cm-def        { color : hsl( 0,    0%,    100% ) }
+    &.cm-atom       { color : hsl( 50,   40%,   60%  ) }
+    &.cm-link       { color : hsl( 240,  100%,  40%  ) }
+    &.cm-error      { color : hsl( 4,    76%,   35%  ) }
+    &.cm-quote      { color : hsl( 120,  100%,  30%  ) }
+    &.cm-header     { color : hsl( 300,  100%,  33%  ) }
+    &.cm-builtin    { color : hsl( 25,   100%,  67%  ) }
+    &.cm-bracket    { color : hsl( 90,   20%,   92%  ) }
+    &.cm-property   { color : hsl( 77,   30%,   51%  ) }
+    &.cm-operator   { color : hsl( 77,   30%,   51%  ) }
+    &.cm-string-2   { color : hsl( 20,   100%,  50%  ) }
+    &.cm-qualifier  { color : hsl( 0,    0%,    33%  ) }
+    &.cm-attribute  { color : hsl( 240,  100%,  40%  ) }
+    &.cm-variable-2 { color : hsl( 189,  20%,   50%  ) }
+    &.cm-variable-3 { color : hsl( 0,    0%,    100% ) }
+  }
+}
+
+.error .CodeMirror-lines pre {
+  color: rgb(199, 0, 56) !important;
+
+  div,
+  span { color: rgb(199, 0, 56) !important; }
+}
+
+/* Animations */
+
+.fade-in,
+.fade-out {
+  .transition(all 0.2s);
+}
+
+.fade-in {
+  opacity: 0;
+  &.fade-in-active { opacity: 1; }
+}
+
+.fade-out {
+  opacity: 1;
+  &.fade-out-active { opacity: 0; }
+}

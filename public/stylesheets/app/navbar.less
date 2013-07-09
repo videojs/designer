@@ -1,0 +1,110 @@
+/*
+Stripped-down refactor of bootstrap navs
+ */
+
+@navBg : #bbb;
+@navLink : #333;
+@navLinkHover : #333;
+@navBgHighlight : #efefef;
+@navBorderBottomWidth : 1px;
+@navHt : 42px;
+
+.navbar,
+.navbar * { .box-sizing(border-box); }
+
+.navbar {
+  height: @navHt;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1030;
+  border-bottom: 1px solid #999;
+  width: 100%;
+
+  .box-shadow(~"0 1px 10px hsla(0, 0%, 0%, 0.2), inset 0 1px 0 white");
+  #gradient > .vertical(@navBgHighlight, @navBg);
+
+  .nav {
+    white-space: nowrap;
+    overflow: hidden;
+    list-style: none;
+    margin: 0;
+
+    > li {
+      display: inline-block;
+      line-height: 1;
+      padding: 0;
+      height: @navHt;
+      vertical-align: top;
+
+      &.divider-vertical {
+        border-left: 1px solid #a0a0a0;
+        border-right: 1px solid #eee;
+      }
+
+      &.brand {
+        font-size: 20px;
+        font-weight: 200;
+        text-shadow: 0 1px 0 @white;
+      }
+
+      > a,
+      > span {
+        padding: 0 20px;
+        line-height: @navHt;
+        display: inline-block;
+        color: hsl(0, 0%, 31%);
+        text-shadow: 0 1px 1px hsla(0, 0%, 100%, 0.7);
+        .transition(all 0.2s);
+
+        &:hover {
+          text-decoration: none;
+          color: #333;
+        }
+      }
+
+      &.active > a,
+      &.active > a:hover,
+      &.active > a:focus {
+        color: @navbarLinkColorActive;
+        text-decoration: none;
+        background-color: @navbarLinkBackgroundActive;
+        .box-shadow(inset 0 3px 8px rgba(0,0,0,.125));
+      }
+
+      &.option-info {
+        span {
+          cursor: default;
+          font-size: 12px;
+          color: hsl(0, 0%, 31%);
+          padding-left: 10px;
+          padding-right: 0;
+          code {
+            font-size: 10px;
+            padding: 1px 2px;
+            background: #e3e3e3;
+            border: 1px solid #ccc;
+            text-shadow: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 979px) {
+  .navbar-fixed-top .navbar-inner,
+  .navbar-fixed-bottom .navbar-inner {
+    padding: 0 5px;
+  }
+
+  .navbar .nav > li.option-info { display: none; }
+}
+
+@media (max-width: 767px) {
+  .navbar-fixed-top,
+  .navbar-fixed-bottom,
+  .navbar-static-top {
+    margin: 0;
+  }
+}

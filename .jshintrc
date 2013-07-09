@@ -1,0 +1,32 @@
+{
+    "sub"      : true
+  , "boss"     : true
+  , "expr"     : true
+  , "node"     : true
+  , "devel"    : true
+  , "curly"    : false
+  , "immed"    : true
+  , "noarg"    : true
+  , "undef"    : true
+  , "newcap"   : true
+  , "shadow"   : true
+  , "newcap"   : false
+  , "eqnull"   : true
+  , "jquery"   : true
+  , "eqeqeq"   : true
+  , "browser"  : true
+  , "latedef"  : false
+  , "supernew" : true
+  , "laxcomma" : true
+  , "laxbreak" : true
+  , "globals"  : {
+      "_"          : true
+    , "$"          : true
+    , "l2c"        : true
+    , "less"       : true
+    , "jQuery"     : true
+    , "amplify"    : true
+    , "angular"    : true
+    , "CodeMirror" : true
+  }
+}
