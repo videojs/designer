@@ -1,28 +1,10 @@
-# LESS2CSS | Live LESS Preview
+# Video.js | Player Skin Designer
 
-[LESS](http://lesscss.org/) is a popular CSS pre-processor. Used on the [Twitter Bootstrap](https://twitter.gitub.com/bootstrap/) project and on many others, LESS makes CSS more powerful by giving designers and developers access to [variables](http://lesscss.org/#-variables), [mixins](http://lesscss.org/#-mixins), [functions](http://lesscss.org/#-functions), [string interpolation](http://lesscss.org/#-string-interpolation), [imports](http://lesscss.org/#-importing), and many other features.
+(A fork of [Less2CSS](https://github.com/brian-frichette/less-preview/) by Brian Frichette.)
 
-## Debugging
+[Video.js](http://www.videojs.com) is a web video player that uses HTML and CSS to build the player controls and other player elements. The CSS of the player is referred to as the "skin", and it can be edited just like any other CSS.
 
-LESS Previewer was cooked us as a way to visualize LESS output quickly by running it directly through the LESS processor. This allows you to test various version of LESS and their support (or lack thereof) of the syntax you are using.
-
-Because LESS has very different levels of support for certain syntax depending on the version, it's often nice to be able to test this directly.
-
-For example selector interpolation like this only works in 1.3.1+
-
-```less
-@mySelector: home-base;
-
-.@{mySelector} {
-  display: block;
-}
-```
-
-## Contributing
-
-### Style
-
-If needed a style-guide will be created for contributors. In the meantime, if you'd like to contribute, please take care to follow the general style of the project.
+The Player Skin Designer allows anyone to edit the CSS of the player, live, to design custom skins. It uses [LESS](http://lesscss.org/), a popular CSS pre-processor, to make editing the CSS a little easier.
 
 ### Requirements for building & running
 
