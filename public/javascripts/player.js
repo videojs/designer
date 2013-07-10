@@ -1,5 +1,5 @@
 // Set up the main Video.js player
-// Moved to it's own file after the app files load
+// Moved to its own file after the app files load
 //   trying to make the volume bar issue go away by giving the
 //   styles longer to load, but it hasn't worked
 var mainPlayer = videojs('main-player', { 
@@ -15,6 +15,14 @@ var mainPlayer = videojs('main-player', {
     {
       type: 'video/webm',
       src: 'http://vjs.zencdn.net/v/oceans.webm'
+    }
+  ],
+  tracks: [
+    {
+      kind: "captions",
+      src: "/javascripts/vendor/video-js/demo.captions.vtt",
+      srclang: "en",
+      label: "English"
     }
   ]
 });
