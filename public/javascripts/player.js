@@ -7,6 +7,7 @@ var mainPlayer = videojs('main-player', {
   preload: 'none',
   width: 'auto', 
   height: 'auto',
+  poster: 'http://video-js.zencoder.com/oceans-clip.jpg',
   sources: [
     {
       type: 'video/mp4',
