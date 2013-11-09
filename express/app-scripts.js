@@ -23,6 +23,7 @@ Scripts.prototype = {
     return {
       vendor: [
           js + '/vendor/jquery.js'
+        , js + '/vendor/autoprefixer.js'
         , js + '/vendor/angular.js'
         , js + '/vendor/amplify.store.js'
         , js + '/vendor/lodash.js'

@@ -57,7 +57,12 @@ l2c.controller('Less2CssCtrl', [
     }
 
     function compileLess() {
-      $scope.cssOutput = LessCompiler.compileLess($scope.lessInput);
+      var compiledCSS = LessCompiler.compileLess($scope.lessInput);
+      if (!LessCompiler.error) {
+        $scope.cssOutput = autoprefixer.compile(compiledCSS);
+      } else {
+        $scope.cssOutput = compiledCSS;
+      }
       $scope.compileError = LessCompiler.error;
       $scope.safeApply();
 
