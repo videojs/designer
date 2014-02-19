@@ -112,7 +112,8 @@ module.exports = function(grunt) {
       options: {
         failOnError: true
       },
-      'npm-update-videojs': { command: 'npm update video.js' }
+      'npm-update-videojs': { command: 'npm update video.js' },
+      'jitsu-deploy': { command: 'jitsu deploy' }
     }
   });
 
@@ -141,11 +142,12 @@ module.exports = function(grunt) {
     grunt.file.write('public/stylesheets/video-js.less', less);
   });
 
-  grunt.registerTask('release', 'Update with new version of video.js', function(){
-    grunt.task.run([
-      'shell:npm-update-videojs',
-      'copy-files',
-      'default'
-    ]);
-  });
+  grunt.registerTask('release', [
+    'shell:npm-update-videojs',
+    'copy-files',
+    'default'
+  ]);
+
+  grunt.registerTask('deploy', ['shell:jitsu-deploy']);
+
 };
