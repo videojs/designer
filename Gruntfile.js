@@ -22,12 +22,15 @@ var scripts = require('./express/app-scripts')(process.cwd())
     , mangle: { except: ['OptionsDrawer', 'CodeMirror', 'angular', 'amplify', 'jQuery', 'Stor', 'less', '$', '_'] }
   };
 
+var shell = require('shelljs');
+
 module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-shell');
 
   grunt.initConfig({
       pkg: grunt.file.readJSON('package.json')
@@ -104,6 +107,12 @@ module.exports = function(grunt) {
       unit: {
         configFile: '<%= paths.express %>/karma.conf.js'
       }
+    },
+    shell: {
+      options: {
+        failOnError: true
+      },
+      'npm-update-videojs': { command: 'npm update video.js' }
     }
   });
 
@@ -115,4 +124,28 @@ module.exports = function(grunt) {
     , 'concat:build'
     , 'karma:unit:run'
   ]);
+
+  grunt.registerTask('copy-files', '', function(){
+    var pkg = JSON.parse(grunt.file.read('node_modules/video.js/package.json'));
+
+    // copy video.js player files
+    shell.rm('-rf', './public/javascripts/vendor/video-js/*');
+    
+    // copy less file
+    shell.cp('-Rf', ['./node_modules/video.js/dist/video-js/*'], './public/javascripts/vendor/video-js');
+    shell.cp('-Rf', ['./node_modules/video.js/src/css/video-js.less'], './public/stylesheets/video-js.less');
+
+    // update the version in the less file
+    var less = grunt.file.read('public/stylesheets/video-js.less');
+    less = less.replace('GENERATED_AT_BUILD', pkg.version);
+    grunt.file.write('public/stylesheets/video-js.less', less);
+  });
+
+  grunt.registerTask('release', 'Update with new version of video.js', function(){
+    grunt.task.run([
+      'shell:npm-update-videojs',
+      'copy-files',
+      'default'
+    ]);
+  });
 };

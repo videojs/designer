@@ -1,59 +1,62 @@
 {
-    "name": "player-designer",
-    "description": "Create custom skins for Video.js. Fork of LESS2CSS.",
-    "version": "0.0.7-14",
-    "private": true,
-    "author": "Steve Heffernan",
-    "homepage": "http://designer.videojs.com",
-    "contributors": [
-        "Brian Frichette <brian.frichette@gmail.com> (https://github.com/brian-frichette)",
-        "Scott Rippey (https://github.com/scottrippey)",
-        "Steve Heffernan (https://github.com/heff)"
-    ],
-    "bugs": {
-        "url": "https://github.com/videojs/designer/issues"
-    },
-    "scripts": {
-        "dev": "nodemon app.js",
-        "start": "node app.js",
-        "startOld": "forever start app.js -l"
-    },
-    "dependencies": {
-        "forever": "0.10.8",
-        "express": "3.3.3",
-        "jade": "0.32.0",
-        "less-middleware": "0.1.12",
-        "lodash": "1.0.x",
-        "passport": "0.1.17",
-        "passport-github": "0.1.5",
-        "mongodb": "1.3.11"
-    },
-    "devDependencies": {
-        "grunt": "0.4.x",
-        "grunt-karma": "0.4.5",
-        "grunt-contrib-uglify": "0.2.2",
-        "grunt-contrib-concat": "0.3.0",
-        "grunt-contrib-watch": "0.4.4",
-        "grunt-contrib-jshint": "0.6.0",
-        "async": "0.1.x",
-        "nodemon": "0.7.8"
-    },
-    "keywords": [
-        "less",
-        "lesscss"
-    ],
-    "repository": "git://github.com/videojs/designer.git",
-    "licenses": [
-        {
-            "type": "MIT",
-            "url": "http://opensource.org/licenses/MIT"
-        }
-    ],
-    "subdomain": "designer",
-    "domains": [
-        "designer.videojs.com"
-    ],
-    "engines": {
-        "node": "0.8.x"
+  "name": "player-designer",
+  "description": "Create custom skins for Video.js. Fork of LESS2CSS.",
+  "version": "0.0.7-14",
+  "private": true,
+  "author": "Steve Heffernan",
+  "homepage": "http://designer.videojs.com",
+  "contributors": [
+    "Brian Frichette <brian.frichette@gmail.com> (https://github.com/brian-frichette)",
+    "Scott Rippey (https://github.com/scottrippey)",
+    "Steve Heffernan (https://github.com/heff)"
+  ],
+  "bugs": {
+    "url": "https://github.com/videojs/designer/issues"
+  },
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js",
+    "startOld": "forever start app.js -l"
+  },
+  "dependencies": {
+    "forever": "0.10.8",
+    "express": "3.3.3",
+    "jade": "0.32.0",
+    "less-middleware": "0.1.12",
+    "lodash": "1.0.x",
+    "passport": "0.1.17",
+    "passport-github": "0.1.5",
+    "mongodb": "1.3.11",
+    "video.js": "~4.4.1"
+  },
+  "devDependencies": {
+    "grunt": "0.4.x",
+    "grunt-karma": "0.4.5",
+    "grunt-contrib-uglify": "0.2.2",
+    "grunt-contrib-concat": "0.3.0",
+    "grunt-contrib-watch": "0.4.4",
+    "grunt-contrib-jshint": "0.6.0",
+    "async": "0.1.x",
+    "nodemon": "0.7.8",
+    "grunt-shell": "~0.6.4",
+    "shelljs": "~0.2.6"
+  },
+  "keywords": [
+    "less",
+    "lesscss"
+  ],
+  "repository": "git://github.com/videojs/designer.git",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
     }
+  ],
+  "subdomain": "designer",
+  "domains": [
+    "designer.videojs.com"
+  ],
+  "engines": {
+    "node": "0.8.x"
+  }
 }
