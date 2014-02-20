@@ -20,5 +20,17 @@ The Player Skin Designer allows anyone to edit the CSS of the player, live, to d
 5. Start the app: `$ npm start`. This will start the app on http://localhost:3000/. [Nodemon](https://github.com/remy/nodemon) will restart the server automatically when it detects a change.
 6. Open a new terminal tab or window and start the [watcher](https://github.com/gruntjs/grunt-contrib-watch) task: `$ grunt watch`. This will compile coffee-script to js, run [jshint](http://jshint.com/) on the output, and [minify](https://github.com/mishoo/UglifyJS) the files, and run all unit tests.
 
+### Video.js Release Process
+
+Update to the latest version of video.js
+```
+grunt release
+```
+
+Publish the changes
+```
+grunt deploy
+```
+
 ---
 Please feel free to contribute or suggest features and improvements.
