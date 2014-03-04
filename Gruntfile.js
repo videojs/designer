@@ -134,7 +134,7 @@ module.exports = function(grunt) {
     
     // copy less file
     shell.cp('-Rf', ['./node_modules/video.js/dist/video-js/*'], './public/javascripts/vendor/video-js');
-    shell.cp('-Rf', ['./node_modules/video.js/src/css/video-js.less'], './public/stylesheets/video-js.less');
+    shell.cp('-Rf', ['./node_modules/video.js/dist/video-js.less'], './public/stylesheets/video-js.less');
 
     // update the version in the less file
     var less = grunt.file.read('public/stylesheets/video-js.less');
