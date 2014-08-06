@@ -1,7 +1,7 @@
 {
   "name": "player-designer",
   "description": "Create custom skins for Video.js. Fork of LESS2CSS.",
-  "version": "0.0.7-19",
+  "version": "0.0.7-20",
   "private": true,
   "author": "Steve Heffernan",
   "homepage": "http://designer.videojs.com",
