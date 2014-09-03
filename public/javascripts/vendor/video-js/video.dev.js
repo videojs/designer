@@ -63,7 +63,7 @@ var vjs = function(id, options, ready){
 var videojs = window['videojs'] = vjs;
 
 // CDN Version. Used to target right flash swf.
-vjs.CDN_VERSION = '4.7';
+vjs.CDN_VERSION = '4.8';
 vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
 /**
@@ -92,6 +92,9 @@ vjs.options = {
   // Add playback rate selection by adding rates
   // 'playbackRates': [0.5, 1, 1.5, 2],
 
+  // default inactivity timeout
+  'inactivityTimeout': 2000,
+
   // Included control sets
   'children': {
     'mediaLoader': {},
@@ -113,10 +116,29 @@ vjs.options = {
 };
 
 // Set CDN Version of swf
-// The added (+) blocks the replace from changing this 4.7 string
+// The added (+) blocks the replace from changing this 4.8 string
 if (vjs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
   videojs.options['flash']['swf'] = vjs.ACCESS_PROTOCOL + 'vjs.zencdn.net/'+vjs.CDN_VERSION+'/video-js.swf';
 }
+
+/**
+ * Utility function for adding languages to the default options. Useful for
+ * amending multiple language support at runtime.
+ *
+ * Example: vjs.addLanguage('es', {'Hello':'Hola'});
+ *
+ * @param  {String} code The language code or dictionary property
+ * @param  {Object} data The data values to be translated
+ * @return {Object} The resulting global languages dictionary object
+ */
+vjs.addLanguage = function(code, data){
+  if(vjs.options['languages'][code] !== undefined) {
+    vjs.options['languages'][code] = vjs.util.mergeOptions(vjs.options['languages'][code], data);
+  } else {
+    vjs.options['languages'][code] = data;
+  }
+  return vjs.options['languages'];
+};
 
 /**
  * Global player list
@@ -818,6 +840,17 @@ vjs.obj.isArray = Array.isArray || function(arr) {
 };
 
 /**
+ * Check to see whether the input is NaN or not.
+ * NaN is the only JavaScript construct that isn't equal to itself
+ * @param {Number} num Number to check
+ * @return {Boolean} True if NaN, false otherwise
+ * @private
+ */
+vjs.isNaN = function(num) {
+  return num !== num;
+};
+
+/**
  * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
    It also stores a unique id on the function so it can be easily removed from events
  * @param  {*}   context The object to bind as scope
@@ -1402,15 +1435,6 @@ vjs.parseUrl = function(url) {
   return details;
 };
 
-// if there's no console then don't try to output messages
-// they will still be stored in vjs.log.history
-var _noop = function(){};
-var _console = window['console'] || {
-  'log': _noop,
-  'warn': _noop,
-  'error': _noop
-};
-
 /**
  * Log messags to the console and history based on the type of message
  *
@@ -1419,8 +1443,20 @@ var _console = window['console'] || {
  * @private
  */
 function _logType(type, args){
+  var argsArray, noop, console;
+
   // convert args to an array to get array functions
-  var argsArray = Array.prototype.slice.call(args);
+  argsArray = Array.prototype.slice.call(args);
+  // if there's no console then don't try to output messages
+  // they will still be stored in vjs.log.history
+  // Was setting these once outside of this function, but containing them
+  // in the function makes it easier to test cases where console doesn't exist
+  noop = function(){};
+  console = window['console'] || {
+    'log': noop,
+    'warn': noop,
+    'error': noop
+  };
 
   if (type) {
     // add the type to the front of the message
@@ -1437,11 +1473,11 @@ function _logType(type, args){
   argsArray.unshift('VIDEOJS:');
 
   // call appropriate log function
-  if (_console[type].apply) {
-    _console[type].apply(_console, argsArray);
+  if (console[type].apply) {
+    console[type].apply(console, argsArray);
   } else {
     // ie8 doesn't allow error.apply, but it will just join() the array anyway
-    _console[type](argsArray.join(' '));
+    console[type](argsArray.join(' '));
   }
 }
 
@@ -1548,7 +1584,7 @@ vjs.util = {};
 vjs.util.mergeOptions = function(obj1, obj2){
   var key, val1, val2;
 
-  // make a copy of obj1 so we're not ovewriting original values.
+  // make a copy of obj1 so we're not overwriting original values.
   // like prototype.options_ and all sub options objects
   obj1 = vjs.obj.copy(obj1);
 
@@ -1566,10 +1602,7 @@ vjs.util.mergeOptions = function(obj1, obj2){
     }
   }
   return obj1;
-};
-
-
-/**
+};/**
  * @fileoverview Player Component - Base class for all UI objects
  *
  */
@@ -2377,6 +2410,9 @@ vjs.Component.prototype.dimensions = function(width, height){
  */
 vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
   if (num !== undefined) {
+    if (num === null || vjs.isNaN(num)) {
+      num = 0;
+    }
 
     // Check if using css width/height (% or px) and adjust
     if ((''+num).indexOf('%') !== -1 || (''+num).indexOf('px') !== -1) {
@@ -2625,7 +2661,7 @@ vjs.Button.prototype.onClick = function(){};
 
   // Focus - Add keyboard functionality to element
 vjs.Button.prototype.onFocus = function(){
-  vjs.on(document, 'keyup', vjs.bind(this, this.onKeyPress));
+  vjs.on(document, 'keydown', vjs.bind(this, this.onKeyPress));
 };
 
   // KeyPress (document level) - Trigger click when keys are pressed
@@ -2639,7 +2675,7 @@ vjs.Button.prototype.onKeyPress = function(event){
 
 // Blur - Remove keyboard triggers
 vjs.Button.prototype.onBlur = function(){
-  vjs.off(document, 'keyup', vjs.bind(this, this.onKeyPress));
+  vjs.off(document, 'keydown', vjs.bind(this, this.onKeyPress));
 };
 /* Slider
 ================================================================================ */
@@ -3409,10 +3445,6 @@ vjs.Player.prototype.dispose = function(){
   if (this.tag && this.tag['player']) { this.tag['player'] = null; }
   if (this.el_ && this.el_['player']) { this.el_['player'] = null; }
 
-  // Ensure that tracking progress and time progress will stop and plater deleted
-  this.stopTrackingProgress();
-  this.stopTrackingCurrentTime();
-
   if (this.tech) { this.tech.dispose(); }
 
   // Component dispose
@@ -3557,16 +3589,6 @@ vjs.Player.prototype.loadTech = function(techName, source){
 
   var techReady = function(){
     this.player_.triggerReady();
-
-    // Manually track progress in cases where the browser/flash player doesn't report it.
-    if (!this.features['progressEvents']) {
-      this.player_.manualProgressOn();
-    }
-
-    // Manually track timeudpates in cases where the browser/flash player doesn't report it.
-    if (!this.features['timeupdateEvents']) {
-      this.player_.manualTimeUpdatesOn();
-    }
   };
 
   // Grab tech-specific options from player options and add source and parent element to use.
@@ -3590,11 +3612,6 @@ vjs.Player.prototype.loadTech = function(techName, source){
 vjs.Player.prototype.unloadTech = function(){
   this.isReady_ = false;
 
-  // Turn off any manual progress or timeupdate tracking
-  if (this.manualProgress) { this.manualProgressOff(); }
-
-  if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
-
   this.tech.dispose();
 
   this.tech = false;
@@ -3614,98 +3631,6 @@ vjs.Player.prototype.unloadTech = function(){
 //   vjs.log('loadedTech')
 // },
 
-/* Fallbacks for unsupported event types
-================================================================================ */
-// Manually trigger progress events based on changes to the buffered amount
-// Many flash players and older HTML5 browsers don't send progress or progress-like events
-vjs.Player.prototype.manualProgressOn = function(){
-  this.manualProgress = true;
-
-  // Trigger progress watching when a source begins loading
-  this.trackProgress();
-
-  // Watch for a native progress event call on the tech element
-  // In HTML5, some older versions don't support the progress event
-  // So we're assuming they don't, and turning off manual progress if they do.
-  // As opposed to doing user agent detection
-  if (this.tech) {
-    this.tech.one('progress', function(){
-
-      // Update known progress support for this playback technology
-      this.features['progressEvents'] = true;
-
-      // Turn off manual progress tracking
-      this.player_.manualProgressOff();
-    });
-  }
-};
-
-vjs.Player.prototype.manualProgressOff = function(){
-  this.manualProgress = false;
-  this.stopTrackingProgress();
-};
-
-vjs.Player.prototype.trackProgress = function(){
-
-  this.progressInterval = setInterval(vjs.bind(this, function(){
-    // Don't trigger unless buffered amount is greater than last time
-
-    var bufferedPercent = this.bufferedPercent();
-
-    if (this.cache_.bufferedPercent != bufferedPercent) {
-      this.trigger('progress');
-    }
-
-    this.cache_.bufferedPercent = bufferedPercent;
-
-    if (bufferedPercent == 1) {
-      this.stopTrackingProgress();
-    }
-  }), 500);
-};
-vjs.Player.prototype.stopTrackingProgress = function(){ clearInterval(this.progressInterval); };
-
-/*! Time Tracking -------------------------------------------------------------- */
-vjs.Player.prototype.manualTimeUpdatesOn = function(){
-  this.manualTimeUpdates = true;
-
-  this.on('play', this.trackCurrentTime);
-  this.on('pause', this.stopTrackingCurrentTime);
-  // timeupdate is also called by .currentTime whenever current time is set
-
-  // Watch for native timeupdate event
-  if (this.tech) {
-    this.tech.one('timeupdate', function(){
-      // Update known progress support for this playback technology
-      this.features['timeupdateEvents'] = true;
-      // Turn off manual progress tracking
-      this.player_.manualTimeUpdatesOff();
-    });
-  }
-};
-
-vjs.Player.prototype.manualTimeUpdatesOff = function(){
-  this.manualTimeUpdates = false;
-  this.stopTrackingCurrentTime();
-  this.off('play', this.trackCurrentTime);
-  this.off('pause', this.stopTrackingCurrentTime);
-};
-
-vjs.Player.prototype.trackCurrentTime = function(){
-  if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
-  this.currentTimeInterval = setInterval(vjs.bind(this, function(){
-    this.trigger('timeupdate');
-  }), 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
-};
-
-// Turn off play progress tracking (when paused or dragging)
-vjs.Player.prototype.stopTrackingCurrentTime = function(){
-  clearInterval(this.currentTimeInterval);
-
-  // #1002 - if the video ends right before the next timeupdate would happen,
-  // the progress bar won't make it all the way to the end
-  this.trigger('timeupdate');
-};
 // /* Player event handlers (how the player reacts to certain events)
 // ================================================================================ */
 
@@ -4027,9 +3952,6 @@ vjs.Player.prototype.currentTime = function(seconds){
   if (seconds !== undefined) {
 
     this.techCall('setCurrentTime', seconds);
-
-    // improve the accuracy of manual timeupdates
-    if (this.manualTimeUpdates) { this.trigger('timeupdate'); }
 
     return this;
   }
@@ -4526,7 +4448,11 @@ vjs.Player.prototype.sourceList_ = function(sources){
       this.loadTech(sourceTech.tech, sourceTech.source);
     }
   } else {
-    this.error({ code: 4, message: this.options()['notSupportedMessage'] });
+    // We need to wrap this in a timeout to give folks a chance to add error event handlers
+    setTimeout(vjs.bind(this, function() {
+      this.error({ code: 4, message: this.localize(this.options()['notSupportedMessage']) });
+    }), 0);
+
     // we could not find an appropriate tech, but let's still notify the delegate that this is it
     // this needs a better comment about why this is needed
     this.triggerReady();
@@ -4861,16 +4787,19 @@ vjs.Player.prototype.listenForUserActivity = function(){
       // Clear any existing inactivity timeout to start the timer over
       clearTimeout(inactivityTimeout);
 
-      // In X seconds, if no more activity has occurred the user will be
-      // considered inactive
-      inactivityTimeout = setTimeout(vjs.bind(this, function() {
-        // Protect against the case where the inactivityTimeout can trigger just
-        // before the next user activity is picked up by the activityCheck loop
-        // causing a flicker
-        if (!this.userActivity_) {
-          this.userActive(false);
-        }
-      }), 2000);
+      var timeout = this.options()['inactivityTimeout'];
+      if (timeout > 0) {
+          // In <timeout> milliseconds, if no more activity has occurred the
+          // user will be considered inactive
+          inactivityTimeout = setTimeout(vjs.bind(this, function () {
+              // Protect against the case where the inactivityTimeout can trigger just
+              // before the next user activity is picked up by the activityCheck loop
+              // causing a flicker
+              if (!this.userActivity_) {
+                  this.userActive(false);
+              }
+          }), timeout);
+      }
     }
   }), 250);
 
@@ -4887,7 +4816,7 @@ vjs.Player.prototype.playbackRate = function(rate) {
     return this;
   }
 
-  if (this.tech && this.tech.features && this.tech.features['playbackRate']) {
+  if (this.tech && this.tech['featuresPlaybackRate']) {
     return this.techGet('playbackRate');
   } else {
     return 1.0;
@@ -5429,11 +5358,11 @@ vjs.VolumeControl = vjs.Component.extend({
     vjs.Component.call(this, player, options);
 
     // hide volume controls when they're not supported by the current tech
-    if (player.tech && player.tech.features && player.tech.features['volumeControl'] === false) {
+    if (player.tech && player.tech['featuresVolumeControl'] === false) {
       this.addClass('vjs-hidden');
     }
     player.on('loadstart', vjs.bind(this, function(){
-      if (player.tech.features && player.tech.features['volumeControl'] === false) {
+      if (player.tech['featuresVolumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');
@@ -5571,11 +5500,11 @@ vjs.MuteToggle = vjs.Button.extend({
     player.on('volumechange', vjs.bind(this, this.update));
 
     // hide mute toggle if the current tech doesn't support volume control
-    if (player.tech && player.tech.features && player.tech.features['volumeControl'] === false) {
+    if (player.tech && player.tech['featuresVolumeControl'] === false) {
       this.addClass('vjs-hidden');
     }
     player.on('loadstart', vjs.bind(this, function(){
-      if (player.tech.features && player.tech.features['volumeControl'] === false) {
+      if (player.tech['featuresVolumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');
@@ -5639,11 +5568,11 @@ vjs.VolumeMenuButton = vjs.MenuButton.extend({
     player.on('volumechange', vjs.bind(this, this.update));
 
     // hide mute toggle if the current tech doesn't support volume control
-    if (player.tech && player.tech.features && player.tech.features.volumeControl === false) {
+    if (player.tech && player.tech['featuresVolumeControl'] === false) {
       this.addClass('vjs-hidden');
     }
     player.on('loadstart', vjs.bind(this, function(){
-      if (player.tech.features && player.tech.features.volumeControl === false) {
+      if (player.tech['featuresVolumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');
@@ -5748,7 +5677,7 @@ vjs.PlaybackRateMenuButton.prototype.onClick = function(){
 
 vjs.PlaybackRateMenuButton.prototype.playbackRateSupported = function(){
   return this.player().tech
-    && this.player().tech.features['playbackRate']
+    && this.player().tech['featuresPlaybackRate']
     && this.player().options()['playbackRates']
     && this.player().options()['playbackRates'].length > 0
   ;
@@ -5996,6 +5925,16 @@ vjs.MediaTechController = vjs.Component.extend({
     options.reportTouchActivity = false;
     vjs.Component.call(this, player, options, ready);
 
+    // Manually track progress in cases where the browser/flash player doesn't report it.
+    if (!this['featuresProgressEvents']) {
+      this.manualProgressOn();
+    }
+
+    // Manually track timeudpates in cases where the browser/flash player doesn't report it.
+    if (!this['featuresTimeupdateEvents']) {
+      this.manualTimeUpdatesOn();
+    }
+
     this.initControlsListeners();
   }
 });
@@ -6131,6 +6070,96 @@ vjs.MediaTechController.prototype.onTap = function(){
   this.player().userActive(!this.player().userActive());
 };
 
+/* Fallbacks for unsupported event types
+================================================================================ */
+// Manually trigger progress events based on changes to the buffered amount
+// Many flash players and older HTML5 browsers don't send progress or progress-like events
+vjs.MediaTechController.prototype.manualProgressOn = function(){
+  this.manualProgress = true;
+
+  // Trigger progress watching when a source begins loading
+  this.trackProgress();
+};
+
+vjs.MediaTechController.prototype.manualProgressOff = function(){
+  this.manualProgress = false;
+  this.stopTrackingProgress();
+};
+
+vjs.MediaTechController.prototype.trackProgress = function(){
+
+  this.progressInterval = setInterval(vjs.bind(this, function(){
+    // Don't trigger unless buffered amount is greater than last time
+
+    var bufferedPercent = this.player().bufferedPercent();
+
+    if (this.bufferedPercent_ != bufferedPercent) {
+      this.player().trigger('progress');
+    }
+
+    this.bufferedPercent_ = bufferedPercent;
+
+    if (bufferedPercent === 1) {
+      this.stopTrackingProgress();
+    }
+  }), 500);
+};
+vjs.MediaTechController.prototype.stopTrackingProgress = function(){ clearInterval(this.progressInterval); };
+
+/*! Time Tracking -------------------------------------------------------------- */
+vjs.MediaTechController.prototype.manualTimeUpdatesOn = function(){
+  this.manualTimeUpdates = true;
+
+  this.player().on('play', vjs.bind(this, this.trackCurrentTime));
+  this.player().on('pause', vjs.bind(this, this.stopTrackingCurrentTime));
+  // timeupdate is also called by .currentTime whenever current time is set
+
+  // Watch for native timeupdate event
+  this.one('timeupdate', function(){
+    // Update known progress support for this playback technology
+    this['featuresTimeupdateEvents'] = true;
+    // Turn off manual progress tracking
+    this.manualTimeUpdatesOff();
+  });
+};
+
+vjs.MediaTechController.prototype.manualTimeUpdatesOff = function(){
+  this.manualTimeUpdates = false;
+  this.stopTrackingCurrentTime();
+  this.off('play', this.trackCurrentTime);
+  this.off('pause', this.stopTrackingCurrentTime);
+};
+
+vjs.MediaTechController.prototype.trackCurrentTime = function(){
+  if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
+  this.currentTimeInterval = setInterval(vjs.bind(this, function(){
+    this.player().trigger('timeupdate');
+  }), 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
+};
+
+// Turn off play progress tracking (when paused or dragging)
+vjs.MediaTechController.prototype.stopTrackingCurrentTime = function(){
+  clearInterval(this.currentTimeInterval);
+
+  // #1002 - if the video ends right before the next timeupdate would happen,
+  // the progress bar won't make it all the way to the end
+  this.player().trigger('timeupdate');
+};
+
+vjs.MediaTechController.prototype.dispose = function() {
+  // Turn off any manual progress or timeupdate tracking
+  if (this.manualProgress) { this.manualProgressOff(); }
+
+  if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
+
+  vjs.Component.prototype.dispose.call(this);
+};
+
+vjs.MediaTechController.prototype.setCurrentTime = function() {
+  // improve the accuracy of manual timeupdates
+  if (this.manualTimeUpdates) { this.player().trigger('timeupdate'); }
+};
+
 /**
  * Provide a default setPoster method for techs
  *
@@ -6139,18 +6168,16 @@ vjs.MediaTechController.prototype.onTap = function(){
  */
 vjs.MediaTechController.prototype.setPoster = function(){};
 
-vjs.MediaTechController.prototype.features = {
-  'volumeControl': true,
+vjs.MediaTechController.prototype['featuresVolumeControl'] = true;
 
-  // Resizing plugins using request fullscreen reloads the plugin
-  'fullscreenResize': false,
-  'playbackRate': false,
+// Resizing plugins using request fullscreen reloads the plugin
+vjs.MediaTechController.prototype['featuresFullscreenResize'] = false;
+vjs.MediaTechController.prototype['featuresPlaybackRate'] = false;
 
-  // Optional events that we can manually mimic with timers
-  // currently not triggered by video-js-swf
-  'progressEvents': false,
-  'timeupdateEvents': false
-};
+// Optional events that we can manually mimic with timers
+// currently not triggered by video-js-swf
+vjs.MediaTechController.prototype['featuresProgressEvents'] = false;
+vjs.MediaTechController.prototype['featuresTimeupdateEvents'] = false;
 
 vjs.media = {};
 /**
@@ -6168,16 +6195,19 @@ vjs.Html5 = vjs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
     // volume cannot be changed from 1 on iOS
-    this.features['volumeControl'] = vjs.Html5.canControlVolume();
+    this['featuresVolumeControl'] = vjs.Html5.canControlVolume();
 
     // just in case; or is it excessively...
-    this.features['playbackRate'] = vjs.Html5.canControlPlaybackRate();
+    this['featuresPlaybackRate'] = vjs.Html5.canControlPlaybackRate();
 
     // In iOS, if you move a video element in the DOM, it breaks video playback.
-    this.features['movingMediaElementInDOM'] = !vjs.IS_IOS;
+    this['movingMediaElementInDOM'] = !vjs.IS_IOS;
 
     // HTML video is able to automatically resize when going to fullscreen
-    this.features['fullscreenResize'] = true;
+    this['featuresFullscreenResize'] = true;
+
+    // HTML video supports progress events
+    this['featuresProgressEvents'] = true;
 
     vjs.MediaTechController.call(this, player, options, ready);
     this.setupTriggers();
@@ -6227,7 +6257,7 @@ vjs.Html5.prototype.createEl = function(){
   // Check if this browser supports moving the element into the box.
   // On the iPhone video will break if you move the element,
   // So we have to create a brand new element.
-  if (!el || this.features['movingMediaElementInDOM'] === false) {
+  if (!el || this['movingMediaElementInDOM'] === false) {
 
     // If the original tag is still there, clone and remove it.
     if (el) {
@@ -6377,7 +6407,13 @@ vjs.Html5.prototype.enterFullScreen = function(){
 vjs.Html5.prototype.exitFullScreen = function(){
   this.el_.webkitExitFullScreen();
 };
-vjs.Html5.prototype.src = function(src){ this.el_.src = src; };
+vjs.Html5.prototype.src = function(src) {
+  if (src === undefined) {
+    return this.el_.src;
+  } else {
+    this.el_.src = src;
+  }
+};
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
 vjs.Html5.prototype.currentSrc = function(){ return this.el_.currentSrc; };
 
@@ -6672,6 +6708,7 @@ vjs.Flash.prototype.src = function(src){
 vjs.Flash.prototype['setCurrentTime'] = function(time){
   this.lastSeekTarget_ = time;
   this.el_.vjs_setProperty('currentTime', time);
+  vjs.MediaTechController.prototype.setCurrentTime.call(this);
 };
 
 vjs.Flash.prototype['currentTime'] = function(time){
